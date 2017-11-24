@@ -1,8 +1,9 @@
-##include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #define SIZE_MAX 500
 
-char one_dimension(char *array, int size);
+char *text_array_create(int);
+char *container_create(int);
 int main(int argc, char ** argv){
 
 
@@ -20,20 +21,21 @@ int main(int argc, char ** argv){
 
 
     if(text != NULL){
-        one_dimension(text_array, SIZE_MAX);
-        one_dimension(container, SIZE_MAX);
+        text_array = text_array_create(SIZE_MAX);
+        container = container_create(SIZE_MAX);
+
         while(fgets(container, SIZE_MAX, text) != NULL){ //fgets PREND EN COMPTE QUE D'UNE LIGNE
             strcat(text_array,container); //CONCATENASION DE LA SUITE DE LA CHAINE DE CARACTERES DE text_array
 
         }
         printf("MESSAGE: ");
-        /*while(text_array[i] != '\0'){
+        while(text_array[i] != '\0'){
             fread(&text_array, sizeof(char), 1, text);
             printf("%c", text_array[i]);
             i++;
             cnt++;
 
-        }*/
+        }
 
         printf("%s", container);
         printf("%s", text_array);
@@ -52,7 +54,7 @@ int main(int argc, char ** argv){
                 case 1:
                     printf("\n   VOUS AVEZ CHOISI LE CRYPTAGE DU MESSAGE\n");
                     free(text_array);
-                    one_dimension(text_array, size_array);
+                    text_array = text_array_create(size_array);
 
 
                     free(text_array);
@@ -78,9 +80,16 @@ int main(int argc, char ** argv){
 
     return 0;
 }
-char one_dimension(char *array, int size){
+char *text_array_create(int size){
 
-    array = malloc(sizeof(char) * size);
-    return array;
+    char *text_array_a = malloc(sizeof(char) * size);
 
+    return text_array_a;
+}
+
+char *container_create(int size){
+
+    char *container_a = malloc(sizeof(char) * size);
+
+    return container_a;
 }
