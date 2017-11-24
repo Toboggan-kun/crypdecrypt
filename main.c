@@ -79,19 +79,7 @@ int main(int argc, char ** argv){
 
     return 0;
 }
-/*char *text_array_create(int size){
 
-    char *text_array_a = malloc(sizeof(char) * size);
-
-    return text_array_a;
-}
-
-char *container_create(int size){
-
-    char *container_a = malloc(sizeof(char) * size);
-
-    return container_a;
-}*/
 
 char *one_dimension_char( char *name, int size ){
 
