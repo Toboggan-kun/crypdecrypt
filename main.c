@@ -131,6 +131,7 @@ int main(int argc, char ** argv){
                         }
 
                         key = two_dimension_int(key, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
+
                         //MATRICE G4,8: TABLEAU A DEUX DIMENSIONS
                         i = 0;
                         j = 0;
@@ -142,7 +143,6 @@ int main(int argc, char ** argv){
                                 key[i][j] = array_file[k] - 48;
                                 k++;
                                 printf("%d", key[i][j]);
-                                printf("\nnani");
                                 cnt++;
                                 if(cnt == 8){
                                     printf("\n   ");
@@ -150,7 +150,7 @@ int main(int argc, char ** argv){
                                 }
 
                             }
-                            printf("i = %d\n");
+                            printf("i = %d\n", i);
                         }
 
                         result = one_dimension_int(result, size_array * 4); //STOCKAGE DU RESULTAT
@@ -215,7 +215,7 @@ int **two_dimension_int(int **array, int lines, int columns){
     int i = 0;
     array = (int*)malloc(sizeof(int*) * lines);
     for(i = 0; i < lines; i++){
-        array = malloc(sizeof(int) * columns);
+        array[i] = malloc(sizeof(int) * columns);
     }
     return array;
 }
