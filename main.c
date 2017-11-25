@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define SIZE_MAX 500
 
 char *one_dimension_char(char *, int);
@@ -8,6 +9,7 @@ int *convert_binary(char *, int *, int);
 char *binary_to_hexa(int *, char *, int);
 char *change_hexa(char *, char *, int);
 int *hexa_to_binary(char *, int *, int);
+int *deleteSpace(char *);
 int main(int argc, char ** argv){
 
 
@@ -17,6 +19,8 @@ int main(int argc, char ** argv){
     char *hexa = NULL;
     char *change = NULL;
     int *array_bits_hexa = NULL;
+    char *matrix_array = NULL;
+    char *array_file = NULL;
     int size_array = 0;
     int i = 0;
     int j = 0;
@@ -64,10 +68,6 @@ int main(int argc, char ** argv){
                     text_array = one_dimension_char(text_array, size_array);
                     array_bits = one_dimension_int(array_bits, size_array * 8);
 
-                    //INITIALISATION DU TABLEAU A 0
-                    for(i = 0; i < size_array * 8; i++){
-                        array_bits[i] = 0;
-                    }
                     cnt = 0;
                     i = 0;
                     while(i < size_array){
@@ -79,6 +79,12 @@ int main(int argc, char ** argv){
                             cnt = 0;
                         }
                     }
+
+                    //INITIALISATION DU TABLEAU A 0
+                    for(i = 0; i < size_array * 8; i++){
+                        array_bits[i] = 0;
+                    }
+
                     //CONVERSION BINAIRE DE LA CHAINE
                     array_bits = convert_binary(text_array, array_bits, size_array);
 
@@ -98,24 +104,51 @@ int main(int argc, char ** argv){
                             cnt = 0;
                         }
                     }
-                    hexa = one_dimension_char(hexa, size_array * 2);
                     //CONVERSION BINAIRE EN HEXA
+                    hexa = one_dimension_char(hexa, size_array * 2);
                     hexa = binary_to_hexa(array_bits, hexa, size_array);
 
                     //CONVERSION ASCII
                     change = one_dimension_char(change, size_array);
                     change = change_hexa(hexa, change, size_array);
 
-                    //CONVERSION HEXA EN BINAIRE
+                    //CONVERSION HEXA EN BINAIRE;
                     array_bits_hexa = one_dimension_int(array_bits_hexa, size_array * 8);
-                    array_bits = hexa_to_binary(change, array_bits_hexa, size_array);
+                    array_bits_hexa = hexa_to_binary(change, array_bits_hexa, size_array);
+
+                    FILE *matrix = NULL;
+                    matrix = fopen("key.txt", "r+t");
+                    char matrix_array[50];
+                    if(matrix != NULL){
+                        fgets(matrix_array, 50, matrix);
+                        //printf("   %s", matrix_array);
+                        cnt = 0;
+                        cnt = strlen(matrix_array);
+                        array_file = one_dimension_char(array_file, cnt);
+                        printf("cnt = %d", cnt);
+                        //SUPPRESSION DES ESPACES
+                        for(i = 0; i < cnt; i++){
+                            array_file = deleteSpace(array_file);
+                            printf("%c", array_file[i]);
+                        }
+
+                    }else{
+                        printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
+                    }
 
 
+                    free(array_file);
+                    free(array_bits_hexa);
+                    free(change);
+                    free(hexa);
+                    free(array_bits);
+                    free(text_array);
+                    free(container);
                     break;
                 case 2:
                     break;
                 case 3:
-
+                    free(array_file);
                     free(array_bits_hexa);
                     free(change);
                     free(hexa);
@@ -293,4 +326,11 @@ int *hexa_to_binary(char *hexa, int *binary, int size){
     }
     printf("\ntaille = %d", result);
     return binary;
+}
+int *deleteSpace(char * str){
+    char * ptr = str;
+    while((ptr = strchr(ptr, ' ')) != NULL){
+        strcpy(ptr, ptr + 1);
+    }
+    return ptr;
 }
