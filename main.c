@@ -9,7 +9,7 @@ int *convert_binary(char *, int *, int);
 char *binary_to_hexa(int *, char *, int);
 char *change_hexa(char *, char *, int);
 int *hexa_to_binary(char *, int *, int);
-int *deleteSpace(char *);
+int deleteSpace(char *);
 int main(int argc, char ** argv){
 
 
@@ -19,7 +19,6 @@ int main(int argc, char ** argv){
     char *hexa = NULL;
     char *change = NULL;
     int *array_bits_hexa = NULL;
-    char *matrix_array = NULL;
     char *array_file = NULL;
     int size_array = 0;
     int i = 0;
@@ -50,7 +49,7 @@ int main(int argc, char ** argv){
         }
 
         size_array = cnt;
-        printf("\n   TAILLE DU FICHIER: %d\n\n", size_array);
+        printf("\n   TAILLE DU FICHIER: %d\n", size_array);
 
         while(choice != 1 || choice != 2 || choice != 3){
 
@@ -64,20 +63,14 @@ int main(int argc, char ** argv){
 
                 case 1:
                     printf("\n   VOUS AVEZ CHOISI LE CRYPTAGE DU MESSAGE\n");
-                    free(text_array);
-                    text_array = one_dimension_char(text_array, size_array);
                     array_bits = one_dimension_int(array_bits, size_array * 8);
 
-                    cnt = 0;
+
                     i = 0;
-                    while(i < size_array){
-                        printf("%d", text_array[i]);
+                    printf("%s", text_array);
+                    while(text_array[i] != '\0'){
+                        printf("%d ", text_array[i]);
                         i++;
-                        cnt++;
-                        if(cnt == 2){
-                            printf(" ");
-                            cnt = 0;
-                        }
                     }
 
                     //INITIALISATION DU TABLEAU A 0
@@ -105,30 +98,35 @@ int main(int argc, char ** argv){
                         }
                     }
                     //CONVERSION BINAIRE EN HEXA
-                    hexa = one_dimension_char(hexa, size_array * 2);
+                    hexa = one_dimension_char(hexa, (size_array * 2));
                     hexa = binary_to_hexa(array_bits, hexa, size_array);
 
                     //CONVERSION ASCII
                     change = one_dimension_char(change, size_array);
+
                     change = change_hexa(hexa, change, size_array);
 
                     //CONVERSION HEXA EN BINAIRE;
-                    array_bits_hexa = one_dimension_int(array_bits_hexa, size_array * 8);
+                    array_bits_hexa = one_dimension_int(array_bits_hexa, (size_array * 8));
+                    printf("ok");
                     array_bits_hexa = hexa_to_binary(change, array_bits_hexa, size_array);
+                    printf("ok2");
+
 
                     FILE *matrix = NULL;
-                    matrix = fopen("key.txt", "r+t");
+                    matrix = fopen("key.txt", "rt");
                     char matrix_array[50];
                     if(matrix != NULL){
                         fgets(matrix_array, 50, matrix);
                         //printf("   %s", matrix_array);
                         cnt = 0;
+                        i = 0;
                         cnt = strlen(matrix_array);
                         array_file = one_dimension_char(array_file, cnt);
                         printf("cnt = %d", cnt);
                         //SUPPRESSION DES ESPACES
                         for(i = 0; i < cnt; i++){
-                            array_file = deleteSpace(array_file);
+                            deleteSpace(array_file);
                             printf("%c", array_file[i]);
                         }
 
@@ -148,13 +146,7 @@ int main(int argc, char ** argv){
                 case 2:
                     break;
                 case 3:
-                    free(array_file);
-                    free(array_bits_hexa);
-                    free(change);
-                    free(hexa);
-                    free(array_bits);
-                    free(text_array);
-                    free(container);
+
                     fclose(text);
                     exit(0);
                     break;
@@ -262,6 +254,7 @@ char *binary_to_hexa(int *bits, char *hexa, int size){
         }
 
     }
+
     return hexa;
 
 }
@@ -313,7 +306,6 @@ int *hexa_to_binary(char *hexa, int *binary, int size){
     }
     //AFFICHAGE
     cnt = 0;
-    result = 0;
     printf("T = ");
     for(i = 0; i < size*8; i++){
         printf("%d", binary[i]); //Affichage du tableau binaire
@@ -322,12 +314,12 @@ int *hexa_to_binary(char *hexa, int *binary, int size){
             printf(" ");
             cnt = 0;
         }
-        result++;
+
     }
-    printf("\ntaille = %d", result);
+
     return binary;
 }
-int *deleteSpace(char * str){
+int deleteSpace(char * str){
     char * ptr = str;
     while((ptr = strchr(ptr, ' ')) != NULL){
         strcpy(ptr, ptr + 1);
