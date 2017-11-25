@@ -7,11 +7,12 @@
 
 char *one_dimension_char(char *, int);
 int *one_dimension_int(int *, int);
-int **two_dimension_int(char **, int, int);
+int **two_dimension_int(int **, int, int);
 int *convert_binary(char *, int *, int);
 char *binary_to_hexa(int *, char *, int);
 char *change_hexa(char *, int *, int);
 int *hexa_to_binary(int *, int *, int);
+int *sub_messages(int **, int *, int , int , int , int *);
 int deleteSpace(char *);
 
 int main(int argc, char ** argv){
@@ -24,7 +25,8 @@ int main(int argc, char ** argv){
     int *change = NULL;
     int *array_bits_hexa = NULL;
     char *array_file = NULL;
-    int key[SIZE_LINE_MATRIX][SIZE_COLUMNS_MATRIX];
+    int **key = NULL;
+    int *result = NULL;
     int size_array = 0;
     int i = 0;
     int j = 0;
@@ -127,61 +129,44 @@ int main(int argc, char ** argv){
                         for(i = 0; i < cnt; i++){
                             deleteSpace(array_file);
                         }
-                        cnt = 0;
+
+                        key = two_dimension_int(key, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
                         //MATRICE G4,8: TABLEAU A DEUX DIMENSIONS
+                        i = 0;
+                        j = 0;
+                        k = 0;
+                        cnt = 0;
                         printf("\n   MATRICE G4:\n\n   ");
-                        for(i = 0; i < 4; i++){
-                            for(j = 0; j < 8; j++){
+                        for(i = 0; i < SIZE_LINE_MATRIX; i++){
+                            for(j = 0; j < SIZE_COLUMNS_MATRIX; j++){
                                 key[i][j] = array_file[k] - 48;
                                 k++;
                                 printf("%d", key[i][j]);
+                                printf("\nnani");
                                 cnt++;
                                 if(cnt == 8){
                                     printf("\n   ");
                                     cnt = 0;
                                 }
+
                             }
+                            printf("i = %d\n");
                         }
-                        /*//PERMUTATION DES COLONNES 1 ET 4
-                        printf("\n   ");
-                        cnt = 0;
-                        i = 0;
-                        int permut[SIZE_LINE_MATRIX][SIZE_COLUMNS_MATRIX];
-                        for(i = 0; i < SIZE_LINE_MATRIX; i++){
-                            permut[i][0] = key[i][4];
-                        }
-                        for(i = 0; i < SIZE_LINE_MATRIX; i++){
-                            key[i][4] = key[i][0];
-                        }
-                        for(i = 0; i < SIZE_LINE_MATRIX; i++){
-                            key[i][0] = permut[i][0];
-                        }
-                        for(i = 0; i < SIZE_LINE_MATRIX; i++){
-                            for(j = 0; j < SIZE_COLUMNS_MATRIX; j++){
-                                printf("%d", key[i][j]);
-                                cnt++;
-                                if(cnt == 8){
-                                    printf("\n   ");
-                                    cnt = 0;
-                                }
-                            }
-                        }*/
 
-
-
+                        result = one_dimension_int(result, size_array * 4); //STOCKAGE DU RESULTAT
+                        result = sub_messages(key, array_bits, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX, size_array, result);
 
 
 
                     }else{
                         printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
                     }
+                    free(result);
+                    for(i = 0; i < SIZE_COLUMNS_MATRIX; i++){
+                        free(key[i]);
+                    }
+                    free(key);
 
-
-
-                    break;
-                case 2:
-                    break;
-                case 3:
                     free(array_file);
                     free(array_bits_hexa);
                     free(change);
@@ -189,6 +174,11 @@ int main(int argc, char ** argv){
                     free(array_bits);
                     free(text_array);
                     free(container);
+                    break;
+                case 2:
+                    break;
+                case 3:
+
                     fclose(text);
                     exit(0);
                     break;
@@ -316,6 +306,53 @@ int deleteSpace(char * str){
     }
     return ptr;
 }
-int sub_messages(int ){
+int *sub_messages(int **key, int *bits, int lines, int columns, int size, int *result_message){
+    printf("\n   CALCUL DES SOUS-MESSAGES X:\n\n   ");
+    //CALCUL DU PRODUIT+SOMME MATRICIEL
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    int one = 0;
+    int two = 0;
+    int cnt = 0; //Garde en mémoire
+    int product = 0;
+    int **convert_array = NULL;
+    int result = 0;
 
+    convert_array = two_dimension_int(convert_array, (size*lines) / 2, columns);
+    for(i = 0; i < (size*4)/2; i++){ //(12 * 4) / 3
+
+        for(one = 0; one < columns; one++){
+
+            product = 0;
+            for(two = 0; two < lines; two++){
+                product += bits[cnt + two] * key[two][one];
+            }
+            if(product % 2 == 0){
+                convert_array[i][one] = 0; //Attribue 0
+
+            }else{
+                convert_array[i][one] = 1; //Attribue 1
+
+            }
+        }
+        cnt += 4; //Permet d'avancer de +3
+    }
+    cnt = 0;
+    result = 0;
+    for(i = 0; i < (size*4)/2; i++){
+        k++;
+        printf("X%d = ", k);
+        for(j = 0; j < 8; j++){
+            printf("%d", convert_array[i][j]);
+            result_message[result] = convert_array[i][j];
+            cnt++;
+            result++;
+            if(cnt == 8){
+                printf("\n   ");
+                cnt = 0;
+            }
+        }
+    }
+    return result_message;
 }
