@@ -44,18 +44,20 @@ int main(int argc, char ** argv){
         text_array = one_dimension_char(text_array, SIZE_MAX);
         container = one_dimension_char(container, SIZE_MAX);
 
-        while(fgets(container, SIZE_MAX, text) != NULL){ //fgets PREND EN COMPTE QUE D'UNE LIGNE
+        if(fgets(container, SIZE_MAX, text) != NULL){ //fgets PREND EN COMPTE QUE D'UNE LIGNE
             strcat(text_array,container); //CONCATENASION DE LA SUITE DE LA CHAINE DE CARACTERES DE text_array
+
 
         }
         printf("   MESSAGE:\n");
-        while(text_array[i] != '\0'){
-            fread(&text_array, sizeof(char), i, text);
+        while(text_array[i] != NULL){
+            fread(&text_array, sizeof(char), 1, text);
             printf("%c", text_array[i]);
             i++;
             cnt++;
 
         }
+
 
         size_array = cnt;
         printf("\n   TAILLE DU FICHIER: %d\n", size_array);
@@ -133,6 +135,7 @@ int main(int argc, char ** argv){
 
 
                         key = two_dimension_int(key, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
+
                         //MATRICE G4,8: TABLEAU A DEUX DIMENSIONS
                         i = 0;
                         j = 0;
@@ -150,6 +153,7 @@ int main(int argc, char ** argv){
                                     cnt = 0;
                                 }
                             }
+
                         }
                         //CALCUL MATRICIEL
                         result = one_dimension_int(result,(size_array * 8) * 2); //STOCKAGE DU RESULTAT
@@ -162,8 +166,7 @@ int main(int argc, char ** argv){
                         crypted_file = fopen("crypted_file.txtc", "w+t");
                         if(crypted_file != NULL){
 
-                            fwrite(result, sizeof(char), 1, crypted_file);
-
+                            strcat(crypted_file, result);
 
                         }else{
                             printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
@@ -374,41 +377,31 @@ int *sub_messages(int **key, int *bits, int lines, int columns, int size, int *r
 int *final_message(int *result_message, int size){
     printf("\n\n   MESSAGE FINAL:\n   ");
     printf("X = (");
-    int result = 0;
+    int result;
+    char letter;
     int cnt = 0;
     int cnt2 = 0;
     int i = 0;
     int j = 0;
     int k = 0;
-    int bits_array[4] = {8, 4, 2, 1};
-    for(i = 0; i < size*4; i ++){
+    int bits_array[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+    //result = one_dimension_char(result, size*2);
+    for(i = 0; i < size*2; i ++){
 
-        for(j = 0; j < 4; j++){
+        for(j = 0; j < 8; j++){
             result += bits_array[j] * result_message[cnt];
+            //printf("result = %d\n", result);
             cnt++;
 
-            if(j == 3){
-                if(result >= 0 && result <= 9){ //0 à 9
-                    result = result + 48;
-                    //printf("result = %d", result);
-                    result_message[k] = result;
-                    printf("%c", result_message[cnt2]);
-                    cnt2++;
-                    k++;
-                    result = 0;
-                }else if(result >= 10 && result <= 15){ //a à f
-                    result = result + 55;
-                    //printf("result = %d", result);
-                    result_message[k] = result;
-                    printf("%c", result_message[cnt2]);
-                    cnt2++;
-                    k++;
-                    result = 0;
-                }
+            if(j == 7){
+                letter = result;
+                printf("%c", letter);
+                result = 0;
+                letter = 0;
             }
         }
     }
     printf(")h");
-    return result_message;
+    return result;
 
 }
