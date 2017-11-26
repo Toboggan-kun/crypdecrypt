@@ -13,6 +13,7 @@ char *binary_to_hexa(int *, char *, int);
 char *change_hexa(char *, int *, int);
 int *hexa_to_binary(int *, int *, int);
 int *sub_messages(int **, int *, int , int , int , int *);
+int *final_message(int *, int);
 int deleteSpace(char *);
 
 int main(int argc, char ** argv){
@@ -130,6 +131,7 @@ int main(int argc, char ** argv){
                             deleteSpace(array_file);
                         }
 
+
                         key = two_dimension_int(key, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
                         //MATRICE G4,8: TABLEAU A DEUX DIMENSIONS
                         i = 0;
@@ -142,19 +144,31 @@ int main(int argc, char ** argv){
                                 key[i][j] = array_file[k] - 48;
                                 k++;
                                 printf("%d", key[i][j]);
-                                printf("\nnani");
                                 cnt++;
                                 if(cnt == 8){
                                     printf("\n   ");
                                     cnt = 0;
                                 }
-
                             }
-                            printf("i = %d\n");
+                        }
+                        //CALCUL MATRICIEL
+                        result = one_dimension_int(result,(size_array * 8) * 2); //STOCKAGE DU RESULTAT
+                        result = sub_messages(key, array_bits, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX, size_array, result);
+                        //AFFICHAGE DU RESULTAT
+                        result = final_message(result, size_array);
+
+                        //CREATION DU FICHIER AVEC MESSAGE CRYPTE
+                        FILE * crypted_file = NULL;
+                        crypted_file = fopen("crypted_file.txtc", "w+t");
+                        if(crypted_file != NULL){
+
+                            fwrite(result, sizeof(char), 1, crypted_file);
+
+
+                        }else{
+                            printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
                         }
 
-                        result = one_dimension_int(result, size_array * 4); //STOCKAGE DU RESULTAT
-                        result = sub_messages(key, array_bits, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX, size_array, result);
 
 
 
@@ -178,6 +192,7 @@ int main(int argc, char ** argv){
                 case 2:
                     break;
                 case 3:
+
 
                     fclose(text);
                     exit(0);
@@ -215,7 +230,7 @@ int **two_dimension_int(int **array, int lines, int columns){
     int i = 0;
     array = (int*)malloc(sizeof(int*) * lines);
     for(i = 0; i < lines; i++){
-        array = malloc(sizeof(int) * columns);
+        array[i] = malloc(sizeof(int) * columns);
     }
     return array;
 }
@@ -319,7 +334,7 @@ int *sub_messages(int **key, int *bits, int lines, int columns, int size, int *r
     int **convert_array = NULL;
     int result = 0;
 
-    convert_array = two_dimension_int(convert_array, (size*lines) / 2, columns);
+    convert_array = two_dimension_int(convert_array, size*2, columns);
     for(i = 0; i < (size*4)/2; i++){ //(12 * 4) / 3
 
         for(one = 0; one < columns; one++){
@@ -340,7 +355,7 @@ int *sub_messages(int **key, int *bits, int lines, int columns, int size, int *r
     }
     cnt = 0;
     result = 0;
-    for(i = 0; i < (size*4)/2; i++){
+    for(i = 0; i < size*2; i++){
         k++;
         printf("X%d = ", k);
         for(j = 0; j < 8; j++){
@@ -355,4 +370,45 @@ int *sub_messages(int **key, int *bits, int lines, int columns, int size, int *r
         }
     }
     return result_message;
+}
+int *final_message(int *result_message, int size){
+    printf("\n\n   MESSAGE FINAL:\n   ");
+    printf("X = (");
+    int result = 0;
+    int cnt = 0;
+    int cnt2 = 0;
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    int bits_array[4] = {8, 4, 2, 1};
+    for(i = 0; i < size*4; i ++){
+
+        for(j = 0; j < 4; j++){
+            result += bits_array[j] * result_message[cnt];
+            cnt++;
+
+            if(j == 3){
+                if(result >= 0 && result <= 9){ //0 à 9
+                    result = result + 48;
+                    //printf("result = %d", result);
+                    result_message[k] = result;
+                    printf("%c", result_message[cnt2]);
+                    cnt2++;
+                    k++;
+                    result = 0;
+                }else if(result >= 10 && result <= 15){ //a à f
+                    result = result + 55;
+                    //printf("result = %d", result);
+                    result_message[k] = result;
+                    printf("%c", result_message[cnt2]);
+                    cnt2++;
+                    k++;
+                    result = 0;
+                }
+            }
+        }
+    }
+    printf(")h");
+    return result_message;
+
 }
