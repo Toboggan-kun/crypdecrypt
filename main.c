@@ -13,7 +13,7 @@ char *binary_to_hexa(int *, char *, int);
 char *change_hexa(char *, int *, int);
 int *hexa_to_binary(int *, int *, int);
 int *sub_messages(int **, int *, int , int , int , int *);
-int *final_message(int *, int);
+char *final_message(int *, int, char*);
 int deleteSpace(char *);
 
 int main(int argc, char ** argv){
@@ -29,6 +29,7 @@ int main(int argc, char ** argv){
     int **key = NULL;
     int *result = NULL;
     int size_array = 0;
+    char *letter = NULL;
     int i = 0;
     int j = 0;
     int k = 0;
@@ -50,8 +51,8 @@ int main(int argc, char ** argv){
 
         }
         printf("   MESSAGE:\n");
-        while(text_array[i] != NULL){
-            fread(&text_array, sizeof(char), 1, text);
+        while(text_array[i] != '\0'){
+            fread(&text_array, sizeof(char), i, text);
             printf("%c", text_array[i]);
             i++;
             cnt++;
@@ -132,8 +133,6 @@ int main(int argc, char ** argv){
                         for(i = 0; i < cnt; i++){
                             deleteSpace(array_file);
                         }
-
-
                         key = two_dimension_int(key, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
 
                         //MATRICE G4,8: TABLEAU A DEUX DIMENSIONS
@@ -156,17 +155,23 @@ int main(int argc, char ** argv){
 
                         }
                         //CALCUL MATRICIEL
+
                         result = one_dimension_int(result,(size_array * 8) * 2); //STOCKAGE DU RESULTAT
                         result = sub_messages(key, array_bits, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX, size_array, result);
                         //AFFICHAGE DU RESULTAT
-                        result = final_message(result, size_array);
+                        letter = one_dimension_char(letter, size_array*2);
+                        letter = final_message(result, size_array, letter);
 
                         //CREATION DU FICHIER AVEC MESSAGE CRYPTE
                         FILE * crypted_file = NULL;
+
                         crypted_file = fopen("crypted_file.txtc", "w+t");
                         if(crypted_file != NULL){
+                            fgets(&letter, SIZE_MAX, crypted_file);
 
-                            strcat(crypted_file, result);
+                                printf("\nOK?");
+
+
 
                         }else{
                             printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
@@ -178,12 +183,14 @@ int main(int argc, char ** argv){
                     }else{
                         printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
                     }
+                    free(letter);
                     free(result);
                     for(i = 0; i < SIZE_COLUMNS_MATRIX; i++){
                         free(key[i]);
                     }
-                    free(key);
 
+                    free(key);
+                    fclose(matrix);
                     free(array_file);
                     free(array_bits_hexa);
                     free(change);
@@ -193,6 +200,39 @@ int main(int argc, char ** argv){
                     free(container);
                     break;
                 case 2:
+                    printf("   VOUS AVEZ CHOISI LE DECRYPTAGE DU MESSAGE\n   ");
+                    FILE * message = NULL;
+                    message = fopen("crypted_file.txtc", "r+t");
+
+                    if(message != NULL){
+
+                        text_array = one_dimension_char(text_array, SIZE_MAX);
+                        container = one_dimension_char(container, SIZE_MAX);
+
+                        if(fgets(container, SIZE_MAX, message) != NULL){ //fgets PREND EN COMPTE QUE D'UNE LIGNE
+                            strcat(text_array,container); //CONCATENASION DE LA SUITE DE LA CHAINE DE CARACTERES DE text_array
+
+
+                        }
+                        printf("MESSAGE:\n");
+                        while(text_array[i] != '\0'){
+                            fread(&text_array, sizeof(char), 1, message);
+                            printf("%c", text_array[i]);
+                            i++;
+                            cnt++;
+
+                        }
+
+
+                        size_array = cnt;
+                        printf("\n   TAILLE DU FICHIER: %d\n", size_array);
+                        free(container);
+                        free(text_array);
+                        fclose(message);
+
+                    }else{
+                        printf("\n\nECHEC DU CHARGEMENT DU FICHIER...");
+                    }
                     break;
                 case 3:
 
@@ -374,16 +414,14 @@ int *sub_messages(int **key, int *bits, int lines, int columns, int size, int *r
     }
     return result_message;
 }
-int *final_message(int *result_message, int size){
+char *final_message(int *result_message, int size, char *letter){
     printf("\n\n   MESSAGE FINAL:\n   ");
     printf("X = (");
     int result;
-    char letter;
     int cnt = 0;
-    int cnt2 = 0;
     int i = 0;
     int j = 0;
-    int k = 0;
+
     int bits_array[8] = {128, 64, 32, 16, 8, 4, 2, 1};
     //result = one_dimension_char(result, size*2);
     for(i = 0; i < size*2; i ++){
@@ -394,14 +432,13 @@ int *final_message(int *result_message, int size){
             cnt++;
 
             if(j == 7){
-                letter = result;
-                printf("%c", letter);
+                letter[i] = result;
+                printf("%c", letter[i]);
                 result = 0;
-                letter = 0;
             }
         }
     }
     printf(")h");
-    return result;
+    return letter;
 
 }
