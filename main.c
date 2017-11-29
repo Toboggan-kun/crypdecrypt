@@ -25,6 +25,7 @@ int *hexa_to_binary(int *, int *, int);
 int *sub_messages(int **, int *, int , int , int , int *);
 char *final_message(int *, int, char*);
 char *message_decrypted(int *, int *, char *, int);
+void check_matrix(int **matrix, int **permut_cols, int lines, int columns);
 int deleteSpace(char *);
 
 int main(int argc, char ** argv){
@@ -38,6 +39,7 @@ int main(int argc, char ** argv){
     int *array_bits_hexa = NULL;
     char *array_file = NULL;
     int **key = NULL;
+    int **permut_matrix = NULL;
     int *result = NULL;
     int size_array = 0;
     char *letter = NULL;
@@ -133,7 +135,9 @@ int main(int argc, char ** argv){
                             deleteSpace(array_file);
                         }
                         key = two_dimension_int(key, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
+                        permut_matrix = two_dimension_int(permut_matrix, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
 
+                        check_matrix(key, permut_matrix, SIZE_LINE_MATRIX, SIZE_COLUMNS_MATRIX);
                         //MATRICE G4,8: TABLEAU A DEUX DIMENSIONS
                         i = 0;
                         j = 0;
@@ -184,7 +188,12 @@ int main(int argc, char ** argv){
                     free(letter);
                     free(result);
                     for(i = 0; i < SIZE_COLUMNS_MATRIX; i++){
-                        free(key[i]);
+                        free(permut_matrix[i]);
+                    }
+                    free(permut_matrix);
+
+                    for(j = 0; j < SIZE_COLUMNS_MATRIX; j++){
+                        free(key[j]);
                     }
                     free(key);
                     fclose(matrix);
@@ -599,4 +608,30 @@ char *message_decrypted(int *bits, int *result, char *message, int size){
     printf("\n\n");
 
     return message;
+}
+void check_matrix(int **matrix, int **permut_cols, int lines, int columns){
+    int i = 0;
+    int j = 0;
+    for(i = 0; i < lines; i++){
+        for(j = 0; j < columns; j++){
+            if(matrix[0][j] == 1 && matrix[1][j] == 0 && matrix[2][j] == 0 && matrix[3][j] == 0){
+                permut_cols[0] = j;
+            }
+            if(matrix[0][j] == 0 && matrix[1][j] == 1 && matrix[2][j] == 0 && matrix[3][j] == 0){
+                permut_cols[1] = j;
+            }
+            if(matrix[0][j] == 0 && matrix[1][j] == 0 && matrix[2][j] == 1 && matrix[3][j] == 0){
+                permut_cols[2] = j;
+            }
+            if(matrix[0][j] == 0 && matrix[1][j] == 0 && matrix[2][j] == 0 && matrix[3][j] == 1){
+                permut_cols[3] = j;
+            }
+
+        }
+    }
+    i = 0;
+    for(i = 0; i < 4; i++){
+		printf("%d ", permut_cols[i]);
+	}
+
 }
