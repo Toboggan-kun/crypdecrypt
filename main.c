@@ -590,17 +590,9 @@ char *message_decrypted(int *bits, int *result, char *message, int size){
             decimal += bits_array[j] * result[cnt];
             cnt++;
             if(j == 7){
-                if(decimal == 131 || decimal == 67 || decimal == 35 || decimal == 19 || decimal == 11){
-                    decimal = decimal - 3;
-                    message[i] = decimal;
-                    printf("%c", message[i]);
-                    decimal = 0;
-                }else{
-                    message[i] = decimal;
-                    printf("%c", message[i]);
-                    decimal = 0;
-                }
-
+                message[i] = decimal;
+                printf("%c", message[i]);
+                decimal = 0;
             }
         }
     }
