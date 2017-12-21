@@ -55,12 +55,13 @@ int main(int argc, char ** argv){
     //char c;
 
         //MENU
-        printf("\n   BIENVENUE SUR CODEC - L'APPLICATION POUR CRYPTER/DECRYPTER VOTRE MESSAGE!\n\n");
-        while(choice != 1 || choice != 2 || choice != 3){
 
+        do{
+            system("cls");
+            printf("\n   BIENVENUE SUR CODEC - L'APPLICATION POUR CRYPTER/DECRYPTER VOTRE MESSAGE!\n\n");
             printf("\n   1- CRYPTER LE MESSAGE\n\n");
             printf("   2- DECRYPTER LE MESSAGE\n\n");
-            printf("   3- QUITTER LE PROGRAMME...\n\n");
+            printf("   0- QUITTER LE PROGRAMME...\n\n");
             printf("   VOTRE CHOIX: ");
 
             scanf("%d", &choice);
@@ -92,25 +93,13 @@ int main(int argc, char ** argv){
 
                         array_bits = one_dimension_int(array_bits, size_array * 8);
 
-
-                        //AFFICHAGE DU MESSAGE EN DECIMAL
-                        /*i = 0;
-                        printf("\n   LE MESSAGE EN DECIMAL:\n\n");
-                        for(i = 0; i < size_array; i++){
-                            printf("%c : %d", text_array[i], text_array[i]);
-                            printf("\n");
-
-                        }
-                        printf("\n");
-                        i = 0;*/
-
                         //CONVERSION BINAIRE DE LA CHAINE
                         array_bits = convert_binary(text_array, array_bits, size_array);
 
                         printf("\n");
                         //OUVERTURE DU FICHIER MATRICE G4,8
                         FILE *matrix = NULL;
-                        matrix = fopen("key.txt", "rt");
+                        matrix = fopen("key2.txt", "rt");
                         char matrix_array[50];
                         if(matrix != NULL){
                             fgets(matrix_array, 50, matrix);
@@ -220,6 +209,7 @@ int main(int argc, char ** argv){
                         printf("\n\n   ECHEC DU CHARGEMENT DU FICHIER...\n");
                     }
                     printf("\n\n");
+                    system("pause");
                     break;
                 case 2:
                     printf("\n   VOUS AVEZ CHOISI LE DECRYPTAGE DU MESSAGE\n\n   ");
@@ -259,7 +249,7 @@ int main(int argc, char ** argv){
                         printf("\n");
 
                         FILE *matrix = NULL;
-                        matrix = fopen("key.txt", "rt");
+                        matrix = fopen("key2.txt", "rt");
 
                         char matrix_array[50];
                         if(matrix != NULL){
@@ -348,18 +338,18 @@ int main(int argc, char ** argv){
                     }else{
                         printf("\n\n   ECHEC DU CHARGEMENT DU FICHIER...\n\n");
                     }
-
-                    break;
-                case 3:
-                    printf("\n   VOUS QUITTEZ LE PROGRAMME...\n");
-                    exit(0);
+                    system("pause");
                     break;
                 default:
-                    printf("\n   VEUILLEZ SAISIR LE NUMERO CORRESPONDANT...\n");
+                    if(choice == 0){
+                        printf("\n   VOUS QUITTEZ LE PROGRAMME...\n");
+                    }else{
+                        printf("\n   VEUILLEZ SAISIR LE NUMERO CORRESPONDANT...\n");
+                    }
                     break;
         }
 
-    }
+    }while(choice != 0);
     return 0;
 
 }
@@ -427,8 +417,6 @@ int *convert_binary(char *array, int *bits, int size){
 
             }else{
                 bits[j + cnt] = 1;
-
-
             }
         }
     }
@@ -462,6 +450,31 @@ int deleteSpace(char * str){
     }
     return ptr;
 }
+
+void check_matrix(int **matrix, int *permut_cols, int lines, int columns){
+    int i = 0;
+    int j = 0;
+    for(j = 0; j < columns; j++){
+        if(matrix[0][j] == 1 && matrix[1][j] == 0 && matrix[2][j] == 0 && matrix[3][j] == 0){
+            permut_cols[0] = j;
+        }
+        if(matrix[0][j] == 0 && matrix[1][j] == 1 && matrix[2][j] == 0 && matrix[3][j] == 0){
+            permut_cols[1] = j;
+        }
+        if(matrix[0][j] == 0 && matrix[1][j] == 0 && matrix[2][j] == 1 && matrix[3][j] == 0){
+            permut_cols[2] = j;
+        }
+        if(matrix[0][j] == 0 && matrix[1][j] == 0 && matrix[2][j] == 0 && matrix[3][j] == 1){
+            permut_cols[3] = j;
+        }
+    }
+    i = 0;
+    printf("\n   LES COLONNES DE LA MATRICE IDENTITE:\n   ");
+    for(i = 0; i < 4; i++){
+		printf("C%d ", permut_cols[i]);
+	}
+
+}
 int *sub_messages(int **key, int *bits, int *permut, int lines, int columns, int size, int *result_message){
     //printf("\n   CALCUL DES SOUS-MESSAGES X:\n\n   ");
     //CALCUL DU PRODUIT+SOMME MATRICIEL
@@ -477,7 +490,9 @@ int *sub_messages(int **key, int *bits, int *permut, int lines, int columns, int
 
     convert_array = two_dimension_int(convert_array, size*2, columns);
 
-    for(i = 0; i < (size*4)/2; i++){
+    //for(i = 0; i < (size*4)/2; i++){
+    while(i < (size*4)/2){
+        printf("\n   i = %d", i);
 
         for(one = 0; one < columns; one++){
 
@@ -486,19 +501,20 @@ int *sub_messages(int **key, int *bits, int *permut, int lines, int columns, int
 
                 product += bits[cnt + two] * key[two][permut[one]];
 
+                printf("\n   two: %d permut: %d", two, permut[one]);
+
             }
             if(product % 2 == 0){
                 convert_array[i][one] = 0; //Attribue 0
 
             }else{
                 convert_array[i][one] = 1; //Attribue 1
-
             }
-
         }
-
+        i++;
         cnt += 4; //Permet d'avancer de +4
     }
+    //}
     cnt = 0;
     result = 0;
     for(i = 0; i < size*2; i++){
@@ -540,7 +556,6 @@ char *final_message(int *result_message, int size, char *letter){
             }
         }
     }
-
     return letter;
 
 }
@@ -558,7 +573,6 @@ char *message_decrypted(int *bits, int *result, char *message, int size){
         }
         result[j] = bits[i + cnt];
         //printf("%d", result[j]);
-
         i++;
         j++;
         k++;
@@ -567,7 +581,6 @@ char *message_decrypted(int *bits, int *result, char *message, int size){
             k = 0;
         }
     }
-
     //CONVERSION BINAIRE EN DECIMAL
     i = 0;
     j = 0;
@@ -590,27 +603,3 @@ char *message_decrypted(int *bits, int *result, char *message, int size){
     return message;
 }
 
-void check_matrix(int **matrix, int *permut_cols, int lines, int columns){
-    int i = 0;
-    int j = 0;
-    for(j = 0; j < columns; j++){
-        if(matrix[0][j] == 1 && matrix[1][j] == 0 && matrix[2][j] == 0 && matrix[3][j] == 0){
-            permut_cols[0] = j;
-        }
-        if(matrix[0][j] == 0 && matrix[1][j] == 1 && matrix[2][j] == 0 && matrix[3][j] == 0){
-            permut_cols[1] = j;
-        }
-        if(matrix[0][j] == 0 && matrix[1][j] == 0 && matrix[2][j] == 1 && matrix[3][j] == 0){
-            permut_cols[2] = j;
-        }
-        if(matrix[0][j] == 0 && matrix[1][j] == 0 && matrix[2][j] == 0 && matrix[3][j] == 1){
-            permut_cols[3] = j;
-        }
-    }
-    i = 0;
-    printf("\n   LES COLONNES DE LA MATRICE IDENTITE:\n   ");
-    for(i = 0; i < 4; i++){
-		printf("C%d ", permut_cols[i]);
-	}
-
-}
